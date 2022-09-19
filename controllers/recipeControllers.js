@@ -13,11 +13,11 @@ function getAllRecipes(req,res){
       });
 }
 
-function createRecipe(req,res){
+function getRecipesById(req,res){
 
 }
 
-function getRecipesById(req,res){
+function createRecipe(req,res){
 
 }
 
