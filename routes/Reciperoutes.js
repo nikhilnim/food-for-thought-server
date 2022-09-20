@@ -2,9 +2,27 @@ const express = require('express');
 const router = express.Router();
 const {getAllRecipes,createRecipe,getRecipesById,updateRecipe,deleteRecipe} = require('../controllers/recipeControllers')
 
+const multer  = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/images/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+    console.log("file",file)
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    const filname = `${uniqueSuffix}${file.originalname}`
+    file.imageName = filname
+    cb(null, `${filname}`)
+  }
+});
+
+const upload = multer({ storage: storage })
+
 router.route('/')
             .get(getAllRecipes)
-            .post(createRecipe)
+            .post(upload.single('image'),createRecipe)
 
 router.route('/:id')
             .get(getRecipesById)
