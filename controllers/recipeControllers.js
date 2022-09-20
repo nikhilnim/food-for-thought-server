@@ -16,7 +16,6 @@ function getRecipesById(req, res) {}
 
 function createRecipe(req, res) {
   const { body: recipe } = req;
-  console.log(recipe)
   if (
     !recipe.title ||
     !recipe.intro ||
@@ -25,10 +24,10 @@ function createRecipe(req, res) {
     !recipe.cookTime ||
     !recipe.serving ||
     !recipe.ingredient ||
-    !recipe.nutrition.calories ||
-    !recipe.nutrition.carbs ||
-    !recipe.nutrition.protein ||
-    !recipe.nutrition.fat || 
+    !recipe.calories ||
+    !recipe.carbs ||
+    !recipe.protein ||
+    !recipe.fat || 
     !recipe.direction   
   ) {
     res.status(206).send('Partial Content')
@@ -39,14 +38,14 @@ function createRecipe(req, res) {
     id:uuidv4(),
     title:recipe.title,
     type:recipe.type,
-    image:recipe.image = 'default.jpg',
+    image:req.file.imageName,
     cookTime:recipe.cookTime,
     direction:recipe.direction,
     nutrition:{
-      calories:recipe.nutrition.calories,
-      fat:recipe.nutrition.fat,
-      protein:recipe.nutrition.protein,
-      carbs:recipe.nutrition.carbs,
+      calories:recipe.calories,
+      fat:recipe.fat,
+      protein:recipe.protein,
+      carbs:recipe.carbs,
     },
     ingredient:recipe.ingredient,
     intro:recipe.intro,
@@ -57,20 +56,21 @@ function createRecipe(req, res) {
       memberId:1,
       comment:"added zucchinni and summer squash and really like it with more vegetables",
       timeStamp:1519211809934
-    }]
+    }],
+    timeStamp:Date.now()
   }
-  console.log("new", newRecipe)
-  // loadRecipeData((err, data)=>{
-  //   if(err){
-  //     res.send("error reading file")
-  //   }else{
-  //     let allRecipes = JSON.parse(data)
-  //     let newRecipes = [...allRecipes,newRecipe]
-  //     saveRecipeData(newRecipes)
-  //     res.json(newRecipe)
-  //   }
 
-  // })
+  loadRecipeData((err, data)=>{
+    if(err){
+      res.send("error reading file")
+    }else{
+      let allRecipes = JSON.parse(data)
+      let newRecipes = [...allRecipes,newRecipe]
+      saveRecipeData(JSON.stringify(newRecipes))
+      res.end()
+    }
+
+  })
 
 }
 

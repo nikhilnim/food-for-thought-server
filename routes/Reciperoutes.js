@@ -10,6 +10,11 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname)
+    console.log("file",file)
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    const filname = `${uniqueSuffix}${file.originalname}`
+    file.imageName = filname
+    cb(null, `${filname}`)
   }
 });
 
@@ -17,7 +22,7 @@ const upload = multer({ storage: storage })
 
 router.route('/')
             .get(getAllRecipes)
-            .post(createRecipe,upload.single('fileImg'))
+            .post(upload.single('image'),createRecipe)
 
 router.route('/:id')
             .get(getRecipesById)
