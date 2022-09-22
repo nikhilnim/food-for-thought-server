@@ -13,6 +13,7 @@ function getAllRecipes(req, res) {
 }
 
 function getRecipesById(req, res) {
+  console.log(req.params.id)
   loadRecipeData((err,data)=>{
     if(err){
       res.status(500).send('File Read err')
@@ -21,7 +22,13 @@ function getRecipesById(req, res) {
       let foundRecipe = allRecipes.find((e)=>{
         return e.id === req.params.id
       })
-      res.json(foundRecipe)
+      console.log(foundRecipe)
+      if(foundRecipe){
+        res.json(foundRecipe)
+      }else{
+        res.send("id not found")
+      }
+     
     }
   })
 }
@@ -151,10 +158,26 @@ function updateRecipe(req, res) {
 function deleteRecipe(req, res) {}
 
 
+function getRecipeBySortProtein(req, res){
+  console.log(req.params)
+  let value = req.params.val
+  loadRecipeData((err,data)=>{
+    let allRecipes = JSON.parse(data);
+    let sortRecipes = allRecipes.filter((e)=>{
+      return e.nutrition.protein > value
+    })
+    console.log(sortRecipes)
+    res.json(sortRecipes)
+  })
+}
+
+
+
 module.exports = {
   getAllRecipes,
   createRecipe,
   getRecipesById,
   updateRecipe,
   deleteRecipe,
+  getRecipeBySortProtein
 };

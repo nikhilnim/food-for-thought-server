@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {getAllRecipes,createRecipe,getRecipesById,updateRecipe,deleteRecipe} = require('../controllers/recipeControllers')
+const {getAllRecipes,createRecipe,getRecipesById,updateRecipe,deleteRecipe,getRecipeBySortProtein} = require('../controllers/recipeControllers')
 
 const multer  = require('multer');
 
@@ -21,11 +21,19 @@ const upload = multer({ storage: storage })
 
 router.route('/')
             .get(getAllRecipes)
-            .post(upload.single('image'),createRecipe)
+            .post(upload.single('image'),createRecipe);
+
+// router.route("/sort").get(getRecipeBySort)  
 
 router.route('/:id')
             .get(getRecipesById)
             .put(upload.single('image'),updateRecipe)
-            .delete(deleteRecipe)
+            .delete(deleteRecipe);
+      
 
+
+router.route('/protein/:val').get(getRecipeBySortProtein)
+// router.route('/calories/:val').get()
+// router.route('/protein/:val/calories/:val').get()
+// router.route('/calories/:val/protein/:val').get()
 module.exports = router;
