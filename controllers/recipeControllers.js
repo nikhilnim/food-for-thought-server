@@ -26,7 +26,7 @@ function getRecipesById(req, res) {
       if(foundRecipe){
         res.json(foundRecipe)
       }else{
-        res.send("id not found")
+        res.status(400).send("no id found")
       }
      
     }
@@ -56,8 +56,8 @@ function createRecipe(req, res) {
   let newRecipe = {
     id:uuidv4(),
     title:recipe.title,
-    type:recipe.type,
-    image:req.file ? req.file.imageName  : 'placeimg_633_411_tech.jpg',
+    type:JSON.parse(recipe.type),
+    image:req.file ? req.file.filename  : 'placeimg_633_411_tech.jpg',
     cookTime:recipe.cookTime,
     direction:recipe.direction,
     nutrition:{
@@ -78,7 +78,7 @@ function createRecipe(req, res) {
     }],
     timeStamp:Date.now()
   }
-
+  console.log("newRecipe",newRecipe)
   loadRecipeData((err, data)=>{
     if(err){
       res.send("error reading file")
@@ -95,6 +95,7 @@ function createRecipe(req, res) {
 
 function updateRecipe(req, res) {
   const { body: recipe } = req;
+  console.log("req",req)
   if (
     !recipe.title ||
     !recipe.intro ||
@@ -116,8 +117,8 @@ function updateRecipe(req, res) {
   let updatedRecipe = {
     id:req.params.id,
     title:recipe.title,
-    type:recipe.type,
-    image:req.file ? req.file.imageName  : recipe.ogiImageName,
+    type:JSON.parse(recipe.type),
+    image:req.file ? req.file.filename  : recipe.ogiImageName,
     cookTime:recipe.cookTime,
     direction:recipe.direction,
     nutrition:{
@@ -148,7 +149,6 @@ function updateRecipe(req, res) {
           return e.id === req.params.id
       })
       allRecipes.splice(recipeIndex,1,updatedRecipe)
-      console.log(allRecipes)
       saveRecipeData(JSON.stringify(allRecipes))
       res.json(updatedRecipe)
     }
@@ -159,19 +159,51 @@ function deleteRecipe(req, res) {}
 
 
 function getRecipeBySortProtein(req, res){
-  console.log(req.params)
   let value = req.params.val
   loadRecipeData((err,data)=>{
     let allRecipes = JSON.parse(data);
     let sortRecipes = allRecipes.filter((e)=>{
-      return e.nutrition.protein > value
+      return Number(e.nutrition.protein) > Number(value)
     })
-    console.log(sortRecipes)
     res.json(sortRecipes)
   })
 }
 
+function getRecipeBySortCalories(req, res){
+  console.log("calories",req.params)
+  let value = req.params.val
+  loadRecipeData((err,data)=>{
+    let allRecipes = JSON.parse(data);
+    let sortRecipes = allRecipes.filter((e)=>{
+      return Number(e.nutrition.calories) < Number(value)
+    })
+    res.json(sortRecipes)
+  })
+}
 
+function getRecipeByProteinAndCalories(req, res){
+  const {proVal, calVal} = req.params
+  console.log(proVal,calVal)
+  loadRecipeData((err,data)=>{
+    if(err){
+      res.status(500).send("error reading data")
+    }else{
+      let allRecipes = JSON.parse(data);
+      let sortRecipes = allRecipes.filter((e)=>{
+        if(e.nutrition.protein>Number(proVal) && e.nutrition.calories<Number(calVal)){
+          return true;
+        }else{
+          return false;
+        }
+      })
+      if(sortRecipes.length==0){
+        res.status(204).json(sortRecipes)
+      }else{
+        res.json(sortRecipes)
+      }
+    }
+  })
+}
 
 module.exports = {
   getAllRecipes,
@@ -179,5 +211,7 @@ module.exports = {
   getRecipesById,
   updateRecipe,
   deleteRecipe,
-  getRecipeBySortProtein
+  getRecipeBySortProtein,
+  getRecipeBySortCalories,
+  getRecipeByProteinAndCalories
 };
