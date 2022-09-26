@@ -20,7 +20,8 @@ function addUser(req, res){
           id:uuidv4(),
           name:name,
           email:email,
-          password:password
+          password:password,
+          favRecipes:[]
         }
         console.log("newUser",newUser)
         let newUsersList = [...usersList,newUser]

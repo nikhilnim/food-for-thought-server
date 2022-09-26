@@ -1,11 +1,1 @@
-[
-  {
-    "id": "c2010652-29a0-45e9-bfca-914ec7622d7f",
-    "name": "Nikhil",
-    "email": "nikhilshetye24@gmail.com",
-    "password": "root",
-    "favRecipes":[
-      {"recipeId":"76914a4f-0bf3-4565-b210-dc6392d083c7"}
-    ]
-  }
-]
+[{"id":"c2010652-29a0-45e9-bfca-914ec7622d7f","name":"Nikhil","email":"nikhilshetye24@gmail.com","password":"root","favRecipes":[{"recipeId":"76914a4f-0bf3-4565-b210-dc6392d083c7"}]},{"id":"6c15b07c-5297-4b6c-bdb9-10ac8a360e6f","name":"Jane","email":"jane@gmail.com","password":"jane","favRecipes":[]}]
