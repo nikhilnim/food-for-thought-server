@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const { loadUserData,saveUserData } = require("../models/userModels");
 const jsonSecretKey = "f91e4494-04b3-4d49-8c27-57faed9e5785";
 const jwt = require("jsonwebtoken");
+
 function addUser(req, res){
   const { email, name, password } = req.body;
   console.log('Users Object:', req.body);
@@ -10,16 +11,25 @@ function addUser(req, res){
       console.log(err)
     }else{
       const usersList = JSON.parse(data);
-      let newUser = {
-        id:uuidv4(),
-        name:name,
-        email:email,
-        password:password
+      const isUserPresent= usersList.some((user)=>{
+        return user.email === email
+      })
+      console.log(isUserPresent)
+      if(!isUserPresent){
+        let newUser = {
+          id:uuidv4(),
+          name:name,
+          email:email,
+          password:password
+        }
+        console.log("newUser",newUser)
+        let newUsersList = [...usersList,newUser]
+        saveUserData(JSON.stringify(newUsersList))
+        res.json({ success: "true" });
+      }else{
+        res.status(404).json("email id is already registered")
       }
-      console.log("newUser",newUser)
-      let newUsersList = [...usersList,newUser]
-      saveUserData(JSON.stringify(newUsersList))
-      res.json({ success: "true" });
+      
     }
   })
 }
@@ -68,6 +78,7 @@ function getUser(req,res){
       let payload = {
         id:user.id,
         name:user.name,
+        favRecipes:user.favRecipes
       }
       console.log(user)
       res.json(payload);
