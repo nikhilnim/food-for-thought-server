@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {addUser,loginUser,getUser} = require("../controllers/userController");
+const {addUser,loginUser,getUser,addToFav} = require("../controllers/userController");
 const jwt = require("jsonwebtoken");
 const jsonSecretKey = "f91e4494-04b3-4d49-8c27-57faed9e5785";
 
@@ -37,4 +37,6 @@ function getToken(req) {
 router.route("/signup").post(addUser);
 router.route("/login").post(loginUser);
 router.route("/profile").get(getUser)
+router.route("/favrecipe").post(addToFav)
+
 module.exports = router;

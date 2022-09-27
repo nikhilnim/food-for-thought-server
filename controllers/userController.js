@@ -87,6 +87,39 @@ function getUser(req,res){
   })
 }
 
+function addToFav(req,res){
+  const {userId,recipeId} = req.body
+  console.log(req.body)
+  loadUserData((err,data)=>{
+    if(err){
+      console.log(err)
+    }else{
+      let usersList = JSON.parse(data)
+      let indexOfUser = usersList.findIndex((user)=>{
+        return user.id === userId
+      })
+
+      if(indexOfUser==-1){
+        res.send("no user found")
+        return 
+      }
+
+      const hasRecipe = usersList[indexOfUser].favRecipes.some((recipes)=>{
+        return recipes.recipeId === recipeId
+      })
+
+      if(!hasRecipe){
+        usersList[indexOfUser].favRecipes.push({recipeId:recipeId})
+        console.log(usersList)
+        saveUserData(JSON.stringify(usersList))
+        res.send("recipe favroutie")
+      }else{
+        res.send("already has recipie to favourite")
+      }
+    }
+  })
+}
+
 module.exports = {
-  addUser,loginUser,getUser
+  addUser,loginUser,getUser,addToFav
 }
