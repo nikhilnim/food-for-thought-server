@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 
 function addUser(req, res){
   const { email, name, password } = req.body;
-  console.log('Users Object:', req.body);
   loadUserData((err,data)=>{
     if(err){
       console.log(err)
@@ -14,7 +13,6 @@ function addUser(req, res){
       const isUserPresent= usersList.some((user)=>{
         return user.email === email
       })
-      console.log(isUserPresent)
       if(!isUserPresent){
         let newUser = {
           id:uuidv4(),
@@ -23,7 +21,6 @@ function addUser(req, res){
           password:password,
           favRecipes:[]
         }
-        console.log("newUser",newUser)
         let newUsersList = [...usersList,newUser]
         saveUserData(JSON.stringify(newUsersList))
         res.json({ success: "true" });
@@ -37,7 +34,6 @@ function addUser(req, res){
 
 function loginUser(req, res) {
   const { email, password } = req.body;
-  console.log(req.body)
   loadUserData((err,data)=>{
     if(err){
       console.log(err)
@@ -50,7 +46,6 @@ function loginUser(req, res) {
           return false
         }
       })
-      console.log(user)
       if(!user){
         res.status(404).send("no user")
       }else{
@@ -63,7 +58,6 @@ function loginUser(req, res) {
 
 function getUser(req,res){
   const {id:userId} = req.decode;
-  console.log(userId)
   loadUserData((err,data)=>{
     if(err){
       console.log(err)
@@ -81,7 +75,6 @@ function getUser(req,res){
         name:user.name,
         favRecipes:user.favRecipes
       }
-      console.log(user)
       res.json(payload);
     }
   })
@@ -89,7 +82,6 @@ function getUser(req,res){
 
 function addToFav(req,res){
   const {userId,recipeId} = req.body
-  console.log(req.body)
   loadUserData((err,data)=>{
     if(err){
       console.log(err)
@@ -110,7 +102,6 @@ function addToFav(req,res){
 
       if(!hasRecipe){
         usersList[indexOfUser].favRecipes.push({recipeId:recipeId})
-        console.log(usersList)
         saveUserData(JSON.stringify(usersList))
         res.send("recipe favroutie")
       }else{
@@ -119,7 +110,35 @@ function addToFav(req,res){
     }
   })
 }
-
+function removeFromFav(req,res){
+  const {id:userId} = req.decode;
+  const {recipeId} = req.params
+  loadUserData((err,data)=>{
+    if(err){
+      console.log(err)
+    }else{
+      let userList = JSON.parse(data);
+      let userIdx = userList.findIndex((user)=>{
+        return userId === user.id
+      })
+      if(userIdx!==-1){
+        let favRecipeIdx = userList[userIdx].favRecipes.findIndex((favRecipe)=>{
+          return favRecipe.recipeId === recipeId
+        })
+        if(favRecipeIdx!==-1){
+          let deletedRecipe = userList[userIdx].favRecipes.splice(favRecipeIdx,1)
+          saveUserData(JSON.stringify(userList))
+          res.json(deletedRecipe[0])
+        }else{
+          res.send("no recipe found")
+        }
+      }else{
+        res.send("no user found")
+      }
+      
+    }
+  })
+}
 module.exports = {
-  addUser,loginUser,getUser,addToFav
+  addUser,loginUser,getUser,addToFav,removeFromFav
 }

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {addUser,loginUser,getUser,addToFav} = require("../controllers/userController");
+const {addUser,loginUser,getUser,addToFav,removeFromFav} = require("../controllers/userController");
 const jwt = require("jsonwebtoken");
 const jsonSecretKey = "f91e4494-04b3-4d49-8c27-57faed9e5785";
 
@@ -14,7 +14,6 @@ router.use((req, res, next) => {
     const token = getToken(req);
 
     if (token) {
-      console.log('Auth Token:', token);
       if (jwt.verify(token, jsonSecretKey)) {
         // Decode the token to pass along to end-points that may need
         // access to data stored in the token.
@@ -38,5 +37,6 @@ router.route("/signup").post(addUser);
 router.route("/login").post(loginUser);
 router.route("/profile").get(getUser)
 router.route("/favrecipe").post(addToFav)
+router.route("/favrecipe/:recipeId").delete(removeFromFav)
 
 module.exports = router;

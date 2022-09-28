@@ -13,7 +13,6 @@ function getAllRecipes(req, res) {
 }
 
 function getRecipesById(req, res) {
-  console.log(req.params.id)
   loadRecipeData((err,data)=>{
     if(err){
       res.status(500).send('File Read err')
@@ -22,7 +21,6 @@ function getRecipesById(req, res) {
       let foundRecipe = allRecipes.find((e)=>{
         return e.id === req.params.id
       })
-      console.log(foundRecipe)
       if(foundRecipe){
         res.json(foundRecipe)
       }else{
@@ -78,7 +76,6 @@ function createRecipe(req, res) {
     }],
     timeStamp:Date.now()
   }
-  console.log("newRecipe",newRecipe)
   loadRecipeData((err, data)=>{
     if(err){
       res.send("error reading file")
@@ -95,7 +92,6 @@ function createRecipe(req, res) {
 
 function updateRecipe(req, res) {
   const { body: recipe } = req;
-  console.log("req",req)
   if (
     !recipe.title ||
     !recipe.intro ||
@@ -139,7 +135,6 @@ function updateRecipe(req, res) {
     }],
     timeStamp:Date.now()
   }
-  console.log(updatedRecipe)
   loadRecipeData((err, data)=>{
     if(err){
       res.send("error reading file")
@@ -155,7 +150,25 @@ function updateRecipe(req, res) {
   })
 }
 
-function deleteRecipe(req, res) {}
+function deleteRecipe(req, res) {
+  loadRecipeData((err,data)=>{
+    if(err){
+      res.status(500).send('File Read err')
+    }else{
+      let allRecipes = JSON.parse(data)
+      let recipeIdx = allRecipes.findIndex((e)=>{
+        return e.id === req.params.id
+      })
+      if(recipeIdx===-1){
+        res.send("no id found") 
+      }else{
+        let deletedRecripe = allRecipes.splice(recipeIdx,1)
+        saveRecipeData(JSON.stringify(allRecipes))
+        res.json(deletedRecripe)
+      }  
+    }
+  })
+}
 
 
 function getRecipeBySortProtein(req, res){
@@ -170,7 +183,6 @@ function getRecipeBySortProtein(req, res){
 }
 
 function getRecipeBySortCalories(req, res){
-  console.log("calories",req.params)
   let value = req.params.val
   loadRecipeData((err,data)=>{
     let allRecipes = JSON.parse(data);
@@ -183,7 +195,6 @@ function getRecipeBySortCalories(req, res){
 
 function getRecipeByProteinAndCalories(req, res){
   const {proVal, calVal} = req.params
-  console.log(proVal,calVal)
   loadRecipeData((err,data)=>{
     if(err){
       res.status(500).send("error reading data")
