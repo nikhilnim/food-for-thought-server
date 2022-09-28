@@ -14,6 +14,7 @@ router.use((req, res, next) => {
     const token = getToken(req);
 
     if (token) {
+      console.log(req.headers.authorization);
       if (jwt.verify(token, jsonSecretKey)) {
         // Decode the token to pass along to end-points that may need
         // access to data stored in the token.
