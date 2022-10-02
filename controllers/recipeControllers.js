@@ -207,8 +207,9 @@ function getRecipeByProteinAndCalories(req, res){
           return false;
         }
       })
+      console.log(sortRecipes)
       if(sortRecipes.length==0){
-        res.status(204).json(sortRecipes)
+        res.status(404).json([{message: "No recipes found"}])
       }else{
         res.json(sortRecipes)
       }

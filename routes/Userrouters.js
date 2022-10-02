@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const jsonSecretKey = "f91e4494-04b3-4d49-8c27-57faed9e5785";
 
 router.use((req, res, next) => {
-  // Signup and login are public URLs that don't require a token
   if (req.url === "/signup" || req.url === "/login") {
     next();
   } else {
@@ -16,8 +15,6 @@ router.use((req, res, next) => {
     if (token) {
       console.log(req.headers.authorization);
       if (jwt.verify(token, jsonSecretKey)) {
-        // Decode the token to pass along to end-points that may need
-        // access to data stored in the token.
         req.decode = jwt.decode(token);
         next();
       } else {
