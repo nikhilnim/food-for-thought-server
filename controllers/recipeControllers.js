@@ -21,7 +21,12 @@ function getRecipesById(req, res) {
       let foundRecipe = allRecipes.find((e)=>{
         return e.id === req.params.id
       })
-      res.json(foundRecipe)
+      if(foundRecipe){
+        res.json(foundRecipe)
+      }else{
+        res.status(400).send("no id found")
+      }
+     
     }
   })
 }
@@ -49,8 +54,8 @@ function createRecipe(req, res) {
   let newRecipe = {
     id:uuidv4(),
     title:recipe.title,
-    type:recipe.type,
-    image:req.file ? req.file.imageName  : 'placeimg_633_411_tech.jpg',
+    type:JSON.parse(recipe.type),
+    image:req.file ? req.file.filename  : 'placeimg_633_411_tech.jpg',
     cookTime:recipe.cookTime,
     direction:recipe.direction,
     nutrition:{
@@ -71,7 +76,6 @@ function createRecipe(req, res) {
     }],
     timeStamp:Date.now()
   }
-
   loadRecipeData((err, data)=>{
     if(err){
       res.send("error reading file")
@@ -109,8 +113,8 @@ function updateRecipe(req, res) {
   let updatedRecipe = {
     id:req.params.id,
     title:recipe.title,
-    type:recipe.type,
-    image:req.file ? req.file.imageName  : recipe.ogiImageName,
+    type:JSON.parse(recipe.type),
+    image:req.file ? req.file.filename  : recipe.ogiImageName,
     cookTime:recipe.cookTime,
     direction:recipe.direction,
     nutrition:{
@@ -131,7 +135,6 @@ function updateRecipe(req, res) {
     }],
     timeStamp:Date.now()
   }
-  console.log(updatedRecipe)
   loadRecipeData((err, data)=>{
     if(err){
       res.send("error reading file")
@@ -141,15 +144,78 @@ function updateRecipe(req, res) {
           return e.id === req.params.id
       })
       allRecipes.splice(recipeIndex,1,updatedRecipe)
-      console.log(allRecipes)
       saveRecipeData(JSON.stringify(allRecipes))
       res.json(updatedRecipe)
     }
   })
 }
 
-function deleteRecipe(req, res) {}
+function deleteRecipe(req, res) {
+  loadRecipeData((err,data)=>{
+    if(err){
+      res.status(500).send('File Read err')
+    }else{
+      let allRecipes = JSON.parse(data)
+      let recipeIdx = allRecipes.findIndex((e)=>{
+        return e.id === req.params.id
+      })
+      if(recipeIdx===-1){
+        res.send("no id found") 
+      }else{
+        let deletedRecripe = allRecipes.splice(recipeIdx,1)
+        saveRecipeData(JSON.stringify(allRecipes))
+        res.json(deletedRecripe)
+      }  
+    }
+  })
+}
 
+
+function getRecipeBySortProtein(req, res){
+  let value = req.params.val
+  loadRecipeData((err,data)=>{
+    let allRecipes = JSON.parse(data);
+    let sortRecipes = allRecipes.filter((e)=>{
+      return Number(e.nutrition.protein) > Number(value)
+    })
+    res.json(sortRecipes)
+  })
+}
+
+function getRecipeBySortCalories(req, res){
+  let value = req.params.val
+  loadRecipeData((err,data)=>{
+    let allRecipes = JSON.parse(data);
+    let sortRecipes = allRecipes.filter((e)=>{
+      return Number(e.nutrition.calories) < Number(value)
+    })
+    res.json(sortRecipes)
+  })
+}
+
+function getRecipeByProteinAndCalories(req, res){
+  const {proVal, calVal} = req.params
+  loadRecipeData((err,data)=>{
+    if(err){
+      res.status(500).send("error reading data")
+    }else{
+      let allRecipes = JSON.parse(data);
+      let sortRecipes = allRecipes.filter((e)=>{
+        if(e.nutrition.protein>Number(proVal) && e.nutrition.calories<Number(calVal)){
+          return true;
+        }else{
+          return false;
+        }
+      })
+      console.log(sortRecipes)
+      if(sortRecipes.length==0){
+        res.status(404).json([{message: "No recipes found"}])
+      }else{
+        res.json(sortRecipes)
+      }
+    }
+  })
+}
 
 module.exports = {
   getAllRecipes,
@@ -157,4 +223,7 @@ module.exports = {
   getRecipesById,
   updateRecipe,
   deleteRecipe,
+  getRecipeBySortProtein,
+  getRecipeBySortCalories,
+  getRecipeByProteinAndCalories
 };
