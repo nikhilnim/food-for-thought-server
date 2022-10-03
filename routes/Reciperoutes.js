@@ -18,10 +18,8 @@ const storage = multer.diskStorage({
     cb(null, "public/images/");
   },
   filename: function (req, file, cb) {
-    console.log("file", file);
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const filname = `${uniqueSuffix}${file.originalname}`;
-    // file.imageName = filname;
     cb(null, `${filname}`);
   },
 });
@@ -29,8 +27,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.route("/").get(getAllRecipes).post(upload.single("image"), createRecipe);
-
-// router.route("/sort").get(getRecipeBySort)
 
 router
   .route("/:id")

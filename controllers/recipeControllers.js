@@ -178,7 +178,11 @@ function getRecipeBySortProtein(req, res){
     let sortRecipes = allRecipes.filter((e)=>{
       return Number(e.nutrition.protein) > Number(value)
     })
-    res.json(sortRecipes)
+    if(sortRecipes.length===0){
+      res.status(404).json([{message: "No recipes found"}])
+    }else{
+      res.json(sortRecipes)
+    }
   })
 }
 
@@ -189,7 +193,11 @@ function getRecipeBySortCalories(req, res){
     let sortRecipes = allRecipes.filter((e)=>{
       return Number(e.nutrition.calories) < Number(value)
     })
-    res.json(sortRecipes)
+    if(sortRecipes.length===0){
+      res.status(404).json([{message: "No recipes found"}])
+    }else{
+      res.json(sortRecipes)
+    }
   })
 }
 
